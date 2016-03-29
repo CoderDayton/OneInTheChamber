@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import com.dayton.oneinthechamber.OneInTheChamber;
+import com.dayton.oneinthechamber.OITC;
 
 public class Config {
 
@@ -19,7 +19,7 @@ public class Config {
 
 	public static Config getConfig(String name) {
 		for (Config config : configs) {
-			if (config.getFileName().replace(".yml", "").equalsIgnoreCase(name)) {
+			if (config.getName().replace(".yml", "").equalsIgnoreCase(name)) {
 				return config;
 			}
 		}
@@ -32,7 +32,7 @@ public class Config {
 	private FileConfiguration fileConfiguration;
 
 	public Config(String fileName) {
-		this.plugin = OneInTheChamber.plugin;
+		this.plugin = OITC.plugin;
 		if (plugin == null) {
 			throw new IllegalArgumentException("plugin cannot be null");
 		}
@@ -45,7 +45,7 @@ public class Config {
 		configs.add(this);
 	}
 
-	public void reloadConfig() {
+	public void reload() {
 		this.fileConfiguration = YamlConfiguration.loadConfiguration(this.configFile);
 
 		InputStream defConfigStream = this.plugin.getResource(this.fileName);
@@ -58,12 +58,12 @@ public class Config {
 
 	public FileConfiguration get() {
 		if (this.fileConfiguration == null) {
-			reloadConfig();
+			reload();
 		}
 		return this.fileConfiguration;
 	}
 
-	public void saveConfig() {
+	public void save() {
 		if ((this.fileConfiguration == null) || (this.configFile == null)) {
 			return;
 		}
@@ -80,7 +80,7 @@ public class Config {
 		}
 	}
 
-	public String getFileName() {
+	public String getName() {
 		return fileName;
 	}
 }
