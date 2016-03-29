@@ -1,10 +1,12 @@
-package com.dayton.oneinthechamber.base;
+package com.dayton.oneinthechamber.core;
 
 import com.dayton.oneinthechamber.tasks.StartCountdown;
+import com.dayton.oneinthechamber.utils.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -21,12 +23,32 @@ public class Arena {
         return arenas;
     }
 
+    public static Arena getArena(Player p) {
+        for (Arena arena : arenas) {
+            for (String s : arena.getPlayers().keySet()) {
+                if (s.equals(p.getName())) {
+                    return arena;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void loadArenas() {
+        FileConfiguration config = Config.getConfig("Arenas").get();
+        for (String arena : config.getConfigurationSection("Arenas").getKeys(false)) {
+            Arena a = new Arena(arena, config.getConfigurationSection("Arenas." + arena));
+            arenas.add(a);
+        }
+        System.out.println("[OITC] Loaded " + arenas.size() + " maps.");
+    }
+
     private String name;
     private ArenaState state;
     private List<Location> spawnLocations;
     private Map<String, Integer> players;
     private int maxScore;
-    private int minPlayers, maxPlayers;
+    private int minPlayers, maxPlayers, killsToWin;
 
     public Arena(String name, ConfigurationSection section) {
         this.name = name;
@@ -54,6 +76,9 @@ public class Arena {
             }
             if (s.equals("MaxPlayers")) {
                 this.maxScore = section.getInt("MaxScore");
+            }
+            if (s.equals("KillsToWin")) {
+                this.maxScore = section.getInt("KillsToWin");
             }
         }
         arenas.add(this);
@@ -110,6 +135,10 @@ public class Arena {
         p.teleport(spawnLocations.get(x));
     }
 
+    public void giveItems(Player p) {
+
+    }
+
     public String getName() {
         return name;
     }
@@ -124,5 +153,21 @@ public class Arena {
 
     public ArenaState getState() {
         return state;
+    }
+
+    public int getKillsToWin() {
+        return killsToWin;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public int getMaxScore() {
+        return maxScore;
+    }
+
+    public int getMinPlayers() {
+        return minPlayers;
     }
 }

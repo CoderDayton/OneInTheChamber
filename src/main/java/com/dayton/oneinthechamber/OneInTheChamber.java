@@ -1,5 +1,7 @@
 package com.dayton.oneinthechamber;
 
+import com.dayton.oneinthechamber.core.Arena;
+import com.dayton.oneinthechamber.utils.Config;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class OneInTheChamber extends JavaPlugin {
@@ -9,6 +11,12 @@ public class OneInTheChamber extends JavaPlugin {
 
     public void onEnable() {
         plugin = this;
+
+        registerListeners();
+        registerCommands();
+        reloadConfig();
+
+        Arena.loadArenas();
     }
 
     private void registerCommands() {
@@ -17,6 +25,10 @@ public class OneInTheChamber extends JavaPlugin {
 
     private void registerListeners() {
 
+    }
+
+    private void loadConfigs() {
+        new Config("Arenas.yml").saveDefaultConfig();
     }
 
 }
