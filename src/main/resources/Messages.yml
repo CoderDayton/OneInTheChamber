@@ -1,21 +1,41 @@
 Prefix: '&8&l(&aOITC&8&l)'
 invalid-cmd:
-- '{prefix} &cNo such command exists.'
+- '{prefix}&cNo such command exists.'
 no-permission:
-- '{prefix} &cYou do not have permission for that.'
+- '{prefix}&cYou do not have permission for that.'
 need-args:
-- '{prefix} &cThis command requires more arguments.'
+- '{prefix}&cThis command requires more arguments.'
 less-args:
-- '{prefix} &cYou specified too many arguments.'
+- '{prefix}&cYou specified too many arguments.'
 map-nonexists:
-- '{prefix} &cNo such map exists with name: &6{map}'
+- '{prefix}&cNo such map exists with name: &6{map}'
 map-exists:
-- '{prefix} &cA map already exists with name: &6{map}'
+- '{prefix}&cA map already exists with name: &6{map}'
 map-created:
-- '{prefix} &aSuccessfully created map: &6{map}'
+- '{prefix}&aSuccessfully created map: &6{map}'
 arena-exists:
-- '{prefix} &cAn arena already exists with name: &6{arena}'
+- '{prefix}&cAn arena already exists with name: &6{arena}'
+arena-nonexists:
+- '{prefix}&cNo such arena exists with name: &6{arena}'
 arena-created:
-- '{prefix} &aSuccessfully created arena: &6{arena}'
+- '{prefix}&aSuccessfully created arena: &6{arena}'
+arena-forceended:
+- '{prefix}&aEnded arena: &6{arena}'
+arena-started:
+- '{prefix}&6Game has started.'
+arena-starting:
+- '{prefix}&6Game starting in &c{time} &6second(s).'
+arena-ended:
+- '&aThe OITC has ended with the winner &6{winner}'
+- '              &cTop Players:'
+- '            &a1. &6{top1} - {score1}'
+- '            &a2. &6{top2} - {score2}'
+- '            &a3. &6{top3} - {score3}'
 spawn-set:
-- '{prefix} &aSuccessfully set a spawn point for map: &6{map}'
+- '{prefix}&aSuccessfully set a spawn point for map: &6{map}'
+lobbyspawn-set:
+- '{prefix}&aSet lobby spawn for map: &6{map}'
+no-lives:
+- '{prefix}&cYou are out of lives. You are now a spectator.'
+death-message:
+- '{prefix}&c{player} &ahas been killed by &c{killer}'

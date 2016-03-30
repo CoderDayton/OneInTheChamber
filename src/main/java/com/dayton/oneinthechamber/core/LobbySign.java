@@ -90,7 +90,7 @@ public class LobbySign {
     private Arena arena;
     private Sign sign;
 
-    public LobbySign(Sign s, Arena arena, int id) {
+    private LobbySign(Sign s, Arena arena, int id) {
         this.id = id;
         this.arena = arena;
         this.sign = s;

@@ -2,6 +2,7 @@ package com.dayton.oneinthechamber.tasks;
 
 import com.dayton.oneinthechamber.OITC;
 import com.dayton.oneinthechamber.core.Arena;
+import com.dayton.oneinthechamber.utils.Message;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class StartCountdown extends BukkitRunnable {
@@ -18,11 +19,11 @@ public class StartCountdown extends BukkitRunnable {
     public void run() {
         if (timeUntilStart <= 0) {
             cancel();
-            arena.messageAll(OITC.prefix + "§6Game has been started!");
+            arena.messageAll("arena-started");
             arena.start();
         } else {
             if (timeUntilStart % 10 == 0 || timeUntilStart <= 5) {
-                arena.messageAll(OITC.prefix + "§6Game starting in §c" + timeUntilStart + " §6second(s).");
+                arena.messageAll("arena-starting", Message.makePlaceholder("time", timeUntilStart));
             }
             timeUntilStart--;
         }

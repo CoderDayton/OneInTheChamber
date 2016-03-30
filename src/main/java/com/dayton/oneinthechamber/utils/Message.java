@@ -33,7 +33,9 @@ public class Message {
 				Config.getConfig("Messages").save();
 				try {
 					in.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				for (String s : messages.getStringList(str)) {
 					s = ChatColor.translateAlternateColorCodes('&', s).replace("{prefix}", OITC.prefix);
 					for (SimpleEntry<String, Object> places : placeHolders) {
@@ -44,7 +46,6 @@ public class Message {
 				}
 			}
 		}
-		return;
 	}
 
 	public static SimpleEntry<String, Object> makePlaceholder(String key, Object value) {
@@ -67,14 +68,15 @@ public class Message {
 				Config.getConfig("Messages").save();
 				try {
 					in.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				for (String s : messages.getStringList(str)) {
 					s = ChatColor.translateAlternateColorCodes('&', s).replace("{prefix}", OITC.prefix);
 					p.sendMessage(s);
 				}
 			}
 		}
-		return;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -90,7 +92,9 @@ public class Message {
 				Config.getConfig("Messages").save();
 				try {
 					in.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				return ChatColor.translateAlternateColorCodes('&', messages.getString(str));
 			}
 		}

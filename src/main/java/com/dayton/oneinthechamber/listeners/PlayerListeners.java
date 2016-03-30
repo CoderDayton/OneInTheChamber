@@ -1,11 +1,10 @@
 package com.dayton.oneinthechamber.listeners;
 
-import com.dayton.oneinthechamber.OITC;
-import com.dayton.oneinthechamber.core.Arena;
-import com.dayton.oneinthechamber.core.LobbySign;
+import com.dayton.oneinthechamber.utils.Message;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,26 +13,15 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class PlayerListeners implements Listener {
+import com.dayton.oneinthechamber.OITC;
+import com.dayton.oneinthechamber.core.Arena;
+import com.dayton.oneinthechamber.core.LobbySign;
 
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent e) {
-        Player p = e.getPlayer();
-        if (Arena.inArena(p)) {
-            Arena arena = Arena.getArena(p);
-            if (arena.getState() == Arena.ArenaState.COUNTDOWN) {
-                if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockY()
-                        != e.getTo().getBlockY() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()) {
-                    e.setTo(e.getFrom());
-                }
-            }
-        }
-    }
+public class PlayerListeners implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
@@ -42,42 +30,51 @@ public class PlayerListeners implements Listener {
             final Arena arena = Arena.getArena(p);
             arena.takeLife(p);
             e.getDrops().clear();
+            e.setDroppedExp(0);
             p.updateInventory();
+            e.setDeathMessage(null);
             if (arena.getPlayerLives(p) >= 1) {
                 p.setHealth(p.getMaxHealth());
-                arena.respawn(p);
-                new BukkitRunnable() {
-                    public void run() {
-                        arena.giveItems(p);
-                    }
-                }.runTaskLater(OITC.plugin, 2L);
+                p.spigot().respawn();
+            } else {
+                p.setHealth(p.getMaxHealth());
+                arena.getSpectate().addSpectator(e.getEntity());
+                e.getEntity().setAllowFlight(true);
+                e.getEntity().setFlying(true);
+                Message.sendMessage(p, "no-lives");
             }
             if (p.getKiller() != null) {
                 Player killer = p.getKiller();
                 int amount = killer.getInventory().getItem(8) != null ? killer.getInventory().getItem(8).getAmount() : 1;
                 killer.getInventory().setItem(8, new ItemStack(Material.ARROW, amount));
                 arena.addKill(killer);
+                arena.messageAll("death-message", Message.makePlaceholder("player", p.getName()), Message.makePlaceholder("killer", killer.getName()));
             }
         }
     }
 
-//    @EventHandler
-//    public void onPlayerRespawn(PlayerRespawnEvent e) {
-//        Player p = e.getPlayer();
-//        if (Arena.inArena(p)) {
-//            Arena arena = Arena.getArena(p);
-//            arena.respawn(p);
-//        }
-//    }
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent e) {
+        final Player p = e.getPlayer();
+        if (Arena.inArena(p)) {
+            final Arena arena = Arena.getArena(p);
+            e.setRespawnLocation(arena.randomRespawn());
+            new BukkitRunnable() {
+                public void run() {
+                    arena.giveItems(p);
+                }
+            }.runTaskLater(OITC.plugin, 2L);
+        }
+    }
 
     @EventHandler
     public void onPlayerHitByArrow(EntityDamageByEntityEvent e) {
         if (e.getEntity() instanceof Player) {
             Player hit = (Player) e.getEntity();
-            if (e.getDamager() != null && e.getDamager() instanceof Player) {
-                Player damager = (Player) e.getDamager();
+            if (e.getDamager() != null && e.getDamager() instanceof Arrow) {
                 if (Arena.inArena(hit)) {
                     hit.setHealth(0);
+                    e.getDamager().remove();
                 }
             }
         }

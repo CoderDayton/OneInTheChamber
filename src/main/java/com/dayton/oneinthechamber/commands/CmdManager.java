@@ -18,18 +18,18 @@ import com.dayton.oneinthechamber.OITC;
 
 public class CmdManager implements CommandExecutor {
 
-	public static ArrayList<Cmd> cmds;
+	private ArrayList<Cmd> cmds;
 
 	public CmdManager() {
 		cmds = new ArrayList<>();
 		cmds.add(new ArenaCreate());
 		cmds.add(new MapCreate());
 		cmds.add(new SetSpawn());
+		cmds.add(new SetLobby());
+		cmds.add(new EndGame());
 	}
 
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		CommandSender p = sender;
-
+	public boolean onCommand(CommandSender p, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("oitc")) {
 			if (args.length == 0) {
 				for (Cmd cm : cmds) {

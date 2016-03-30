@@ -36,7 +36,7 @@ public class Spectate implements Listener {
 	}
 	
 	public void removeSpectator(Player p) {
-		spectators.remove(p);
+		spectators.remove(p.getName());
 		getShown(p);
 		p.getInventory().setItem(0, null);
         p.setAllowFlight(false);
@@ -44,7 +44,7 @@ public class Spectate implements Listener {
 	}
 	
 	public boolean isSpectating(Player p) {
-		return spectators.contains(p);
+		return spectators.contains(p.getName());
 	}
 	
 	private void giveCompass(Player p) {
@@ -60,12 +60,14 @@ public class Spectate implements Listener {
 
     private void getHidden(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 15), true);
+//		player.setCollidable(false);
 	}
 
     private void getShown(Player player) {
 		for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
+//		player.setCollidable(true);
 	}
 	
 	@EventHandler
@@ -78,20 +80,6 @@ public class Spectate implements Listener {
 				ListIterator<String> it = pClone.listIterator();
 				e.getPlayer().teleport(Bukkit.getPlayer(it.next()).getLocation());
 			}
-		}
-	}
-	
-	@EventHandler
-	public void playerDeath(PlayerDeathEvent e) {
-		if (arena.hasPlayer(e.getEntity())) {
-            if (arena.getPlayerLives(e.getEntity()) <= 0) {
-                e.getEntity().setHealth(e.getEntity().getMaxHealth());
-                e.setDroppedExp(0);
-                e.getDrops().clear();
-                addSpectator(e.getEntity());
-                e.getEntity().setAllowFlight(true);
-                e.getEntity().setFlying(true);
-            }
 		}
 	}
 	

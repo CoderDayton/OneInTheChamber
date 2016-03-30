@@ -15,7 +15,7 @@ import com.dayton.oneinthechamber.OITC;
 
 public class Config {
 
-	public static List<Config> configs = new ArrayList<>();
+	private static List<Config> configs = new ArrayList<>();
 
 	public static Config getConfig(String name) {
 		for (Config config : configs) {
@@ -45,7 +45,7 @@ public class Config {
 		configs.add(this);
 	}
 
-	public void reload() {
+	private void reload() {
 		this.fileConfiguration = YamlConfiguration.loadConfiguration(this.configFile);
 
 		InputStream defConfigStream = this.plugin.getResource(this.fileName);

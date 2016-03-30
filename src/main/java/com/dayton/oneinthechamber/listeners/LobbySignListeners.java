@@ -38,7 +38,6 @@ public class LobbySignListeners implements Listener {
                 LobbySign ls = LobbySign.getSign(loc);
                 ls.update();
             }
-            return;
         }
     }
 

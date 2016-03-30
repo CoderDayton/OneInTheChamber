@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import com.dayton.oneinthechamber.core.ArenaMap;
 import com.dayton.oneinthechamber.utils.Message;
 
-@CmdManager.CmdInfo(aliases = { "addspawn", "as" }, description = "Add a spawn point to a map", permission = "oitc.setspawn", usage = "")
-public class SetSpawn extends CmdManager.Cmd {
+@CmdManager.CmdInfo(aliases = { "setlobby", "sl" }, description = "Set the lobby spawn for a map", permission = "oitc.setlobby", usage = "")
+public class SetLobby extends CmdManager.Cmd {
 
     public void onCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
@@ -22,8 +22,8 @@ public class SetSpawn extends CmdManager.Cmd {
             }
 
             ArenaMap map = ArenaMap.getMap(name);
-            map.addLocation(p.getLocation());
-            Message.sendMessage(p, "spawn-set", Message.makePlaceholder("map", name));
+            map.setLobbySpawn(p.getLocation());
+            Message.sendMessage(p, "lobbyspawn-set", Message.makePlaceholder("map", name));
         } else {
             sender.sendMessage("You need to be a player to do this.");
         }
