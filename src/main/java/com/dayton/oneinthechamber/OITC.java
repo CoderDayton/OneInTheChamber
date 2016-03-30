@@ -1,9 +1,12 @@
 package com.dayton.oneinthechamber;
 
+import com.dayton.oneinthechamber.commands.CmdManager;
 import com.dayton.oneinthechamber.core.Arena;
 import com.dayton.oneinthechamber.core.ArenaMap;
 import com.dayton.oneinthechamber.core.LobbySign;
+import com.dayton.oneinthechamber.listeners.EntityListeners;
 import com.dayton.oneinthechamber.listeners.LobbySignListeners;
+import com.dayton.oneinthechamber.listeners.PlayerListeners;
 import com.dayton.oneinthechamber.utils.Config;
 import com.dayton.oneinthechamber.utils.Message;
 import org.bukkit.plugin.PluginManager;
@@ -25,16 +28,18 @@ public class OITC extends JavaPlugin {
         Arena.loadArenas();
         LobbySign.loadSigns();
 
-        prefix = Message.getMessage("Prefix");
+        prefix = Message.getMessage("Prefix") + " ";
     }
 
     private void registerCommands() {
-
+        getCommand("oitc").setExecutor(new CmdManager());
     }
 
     private void registerListeners() {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new LobbySignListeners(), this);
+        pm.registerEvents(new PlayerListeners(), this);
+        pm.registerEvents(new EntityListeners(), this);
     }
 
     private void loadConfigs() {

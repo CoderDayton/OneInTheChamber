@@ -22,7 +22,9 @@ public class CmdManager implements CommandExecutor {
 
 	public CmdManager() {
 		cmds = new ArrayList<>();
-
+		cmds.add(new ArenaCreate());
+		cmds.add(new MapCreate());
+		cmds.add(new SetSpawn());
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -70,7 +72,7 @@ public class CmdManager implements CommandExecutor {
 	}
 	
 	public static abstract class Cmd {
-		public abstract void onCommand(CommandSender p, String[] args);
+		public abstract void onCommand(CommandSender sender, String[] args);
 	}
 	
 	@Retention(RetentionPolicy.RUNTIME)

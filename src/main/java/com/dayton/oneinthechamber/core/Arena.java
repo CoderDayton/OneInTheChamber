@@ -2,14 +2,15 @@ package com.dayton.oneinthechamber.core;
 
 import java.util.*;
 
+import com.dayton.oneinthechamber.events.PlayerLeaveArenaEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.dayton.oneinthechamber.events.ArenaStateChangeEvent;
 import com.dayton.oneinthechamber.events.PlayerJoinArenaEvent;
 import com.dayton.oneinthechamber.tasks.StartCountdown;
 import com.dayton.oneinthechamber.utils.Config;
@@ -56,6 +57,16 @@ public class Arena {
         return false;
     }
 
+    public static void addArena(String name, ArenaMap map) {
+        FileConfiguration config = Config.getConfig("Arenas").get();
+        config.set("Arenas." + name + ".Map", map.getName());
+        config.set("Arenas." + name + ".MaxScore", 10);
+        config.set("Arenas." + name + ".MinPlayers", 2);
+        config.set("Arenas." + name + ".MaxPlayers", 8);
+        Config.getConfig("Arenas").save();
+        loadArenas();
+    }
+
     public static void loadArenas() {
         FileConfiguration config = Config.getConfig("Arenas").get();
         for (String arena : config.getConfigurationSection("Arenas").getKeys(false)) {
@@ -68,18 +79,18 @@ public class Arena {
     private String name;
     private ArenaMap map;
     private ArenaState state;
-    private List<Location> spawnLocations;
     private Map<String, Integer> players;
     private Map<String, Integer> playerLives;
     private int maxScore;
     private int minPlayers, maxPlayers, killsToWin;
+    private Spectate spectate;
 
     public Arena(String name, ConfigurationSection section) {
         this.name = name;
         this.state = ArenaState.WAITING;
-        this.spawnLocations = new ArrayList<>();
         this.players = new HashMap<>();
         this.playerLives = new HashMap<>();
+        this.spectate = new Spectate(this);
         for (String s : section.getKeys(false)) {
             if (s.equals("Map")) {
                 this.map = ArenaMap.getMap(section.getString("Map"));
@@ -88,13 +99,10 @@ public class Arena {
                 this.maxScore = section.getInt("MaxScore");
             }
             if (s.equals("MinPlayers")) {
-                this.maxScore = section.getInt("MaxScore");
+                this.minPlayers = section.getInt("MinPlayers");
             }
             if (s.equals("MaxPlayers")) {
-                this.maxScore = section.getInt("MaxScore");
-            }
-            if (s.equals("KillsToWin")) {
-                this.maxScore = section.getInt("KillsToWin");
+                this.maxPlayers = section.getInt("MaxPlayers");
             }
         }
     }
@@ -114,13 +122,19 @@ public class Arena {
             return;
         }
         if (!hasPlayer(p)) {
+            if (state != ArenaState.IN_LOBBY) {
+                state = ArenaState.IN_LOBBY;
+                Bukkit.getPluginManager().callEvent(new ArenaStateChangeEvent(this, ArenaState.WAITING, ArenaState.IN_LOBBY));
+            }
             players.put(p.getName(), 0);
             playerLives.put(p.getName(), 5);
             p.setWalkSpeed(0);
             respawn(p);
             Bukkit.getPluginManager().callEvent(new PlayerJoinArenaEvent(p, this));
-            if (state != ArenaState.IN_LOBBY) {
-                state = ArenaState.IN_LOBBY;
+            if (players.size() >= minPlayers) {
+                state = ArenaState.COUNTDOWN;
+                Bukkit.getPluginManager().callEvent(new ArenaStateChangeEvent(this, ArenaState.IN_LOBBY, ArenaState.WAITING));
+                startCountdown();
             }
         } else {
             p.sendMessage("§cAlready is this game.");
@@ -132,6 +146,8 @@ public class Arena {
             players.remove(p.getName());
             playerLives.remove(p.getName());
             p.performCommand("spawn");
+            spectate.removeSpectator(p);
+            Bukkit.getPluginManager().callEvent(new PlayerLeaveArenaEvent(p, this));
         }
     }
 
@@ -142,6 +158,8 @@ public class Arena {
     }
 
     public void start() {
+        state = ArenaState.IN_GAME;
+        Bukkit.getPluginManager().callEvent(new ArenaStateChangeEvent(this, ArenaState.IN_LOBBY, ArenaState.IN_GAME));
         for (String s : players.keySet()) {
             Bukkit.getPlayer(s).setWalkSpeed(0.2f);
         }
@@ -149,24 +167,35 @@ public class Arena {
 
     public void end() {
         state = ArenaState.WAITING;
+        Bukkit.getPluginManager().callEvent(new ArenaStateChangeEvent(this, ArenaState.IN_GAME, ArenaState.WAITING));
+        for (String s : players.keySet()) {
+            Player p = Bukkit.getPlayer(s);
+            spectate.removeSpectator(p);
+        }
+        spectate.getSpectators().clear();
         players.clear();
         playerLives.clear();
     }
 
     public void startCountdown() {
+        for (String s : players.keySet()) {
+            giveItems(Bukkit.getPlayer(s));
+        }
         new StartCountdown(this, 10);
     }
 
     public void respawn(Player p) {
-        int x = new Random().nextInt(spawnLocations.size());
-        p.teleport(spawnLocations.get(x));
+        int x = new Random().nextInt(map.getLocations().size());
+        p.teleport(map.getLocations().get(x));
     }
 
     public void giveItems(Player p) {
+        p.getInventory().clear();
         p.getInventory().setItem(0, new ItemStack(Material.WOOD_SWORD));
         p.getInventory().setItem(1, new ItemStack(Material.BOW));
         p.getInventory().setItem(7, new ItemStack(Material.REDSTONE, getPlayerLives(p)));
         p.getInventory().setItem(8, new ItemStack(Material.ARROW));
+        p.updateInventory();
     }
 
     public int getPlayerLives(Player p) {
@@ -198,10 +227,6 @@ public class Arena {
 
     public String getName() {
         return name;
-    }
-
-    public List<Location> getSpawnLocations() {
-        return spawnLocations;
     }
 
     public Map<String, Integer> getPlayers() {

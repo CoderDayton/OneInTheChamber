@@ -3,6 +3,7 @@ package com.dayton.oneinthechamber.listeners;
 import com.dayton.oneinthechamber.OITC;
 import com.dayton.oneinthechamber.core.Arena;
 import com.dayton.oneinthechamber.core.LobbySign;
+import com.dayton.oneinthechamber.events.ArenaStateChangeEvent;
 import com.dayton.oneinthechamber.events.PlayerJoinArenaEvent;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
@@ -53,6 +54,11 @@ public class LobbySignListeners implements Listener {
 
     @EventHandler
     public void onArenaJoin(PlayerJoinArenaEvent e) {
+        LobbySign.getSign(e.getArena()).update();
+    }
+
+    @EventHandler
+    public void onArenaJoin(ArenaStateChangeEvent e) {
         LobbySign.getSign(e.getArena()).update();
     }
 

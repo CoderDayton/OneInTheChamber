@@ -35,6 +35,12 @@ public class LobbySign {
                 continue;
             }
             Sign sign = (Sign) loc.getBlock().getState();
+            if (arena == null) {
+                sign.getBlock().breakNaturally();
+                config.set("Signs." + i, null);
+                Config.getConfig("Signs").save();
+                continue;
+            }
             LobbySign ls = new LobbySign(sign, arena, i);
             ls.update();
             signs.add(ls);
@@ -93,7 +99,7 @@ public class LobbySign {
     public void update() {
         this.sign.setLine(0, "§a" + arena.getMap().getName());
         this.sign.setLine(1, WordUtils.capitalizeFully(arena.getState().name().replace("_", " ")));
-        this.sign.setLine(2, arena.getPlayers().size() + "/" + arena.getMaxPlayers());
+        this.sign.setLine(2, "Players: " + arena.getPlayers().size() + "/" + arena.getMaxPlayers());
         this.sign.setLine(3, "§4" + arena.getName());
         new BukkitRunnable() {
             public void run() {

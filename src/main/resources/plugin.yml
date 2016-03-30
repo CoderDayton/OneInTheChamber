@@ -1,0 +1,8 @@
+name: ${project.artifactId}
+main: com.dayton.oneinthechamber.OITC
+version: ${project.version}
+author: Dayton
+commands:
+  oitc:
+    description: Default oitc command.
+    aliases: [oneinthechamber]
